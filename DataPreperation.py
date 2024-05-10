@@ -1,5 +1,5 @@
 import pandas
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
 def ReadData():
@@ -7,13 +7,13 @@ def ReadData():
     global fillerData
 
     #read in the file and use pandas to read the csv
-    playerCSVData = "data/wowbgs"
+    playerCSVData = "data/wowbgs.csv"
     playerData = pandas.read_csv(playerCSVData)
 
     fillerData = playerData[['KB', 'D', 'HK']].fillna(0) #player gender, player age, character class{es}, character race(s)
 
-def FilterByGender(gender):
-    playerFilteredData = playerData[playerData['Gender']]
+def FilterByFaction(faction):
+    playerFilteredData = playerData[playerData["Faction"] == faction]
 
     return playerFilteredData
 
@@ -21,7 +21,7 @@ def ElbowPlot():
     global withinSumOfSquares
 
     withinSumOfSquares = []
-    elbowCheck = 150 #ax num of clusters
+    elbowCheck = 50 #max num of clusters
 
     print("-----Calculating data-----\n")
 
@@ -32,4 +32,3 @@ def ElbowPlot():
     print("-----Graph Plotting-----")
     plt.plot(withinSumOfSquares)
     plt.show()
-

@@ -6,174 +6,117 @@ import UserTesting as tests
 
 
 
-#dictionary list to store classes against player IDs (the correct one then the predicted one)
+
+#lists used to store classes for playerID's
 playerClassificationsAI = {}
 playerClassifications = {}
 
-#lists to store running sums
+#lists to store summed ammounts of 
 totalKillsArr = []
-totalDeathsArr = []
 totalAssistsArr = []
+totalDeathsArr = []
 
-totalKillsNorm = []
-totalDeathsNorm = []
-totalAssistsNorm = []
-
-
-
-
+#function used to classify players into tags depending on how player stats compare to the AI 'rules'
 def PlayerClassification(players):
 
     print("-----Getting highest scoring stats from player's info-----\n")
-    for playerID, playerData in players:
+    for index, row in players.iterrows():
 
+        #iterate through game dataset to get player data
+        playerData = row
         filledData = playerData[["KB", "D", "HK"]].fillna(0)
 
+            #kills
         totalKills = filledData["KB"].sum()
         totalKillsArr.append(totalKills)
-        mostKills = max(totalAssistsArr)
 
+            #assist
         totalAssists = filledData["HK"]
         totalAssistsArr.append(totalAssists)
-        mostAssists = max(totalAssistsArr)
 
+            #deaths
         totalDeaths = filledData["D"]
         totalDeathsArr.append(totalDeaths)
-        mostDeaths = max(totalDeathsArr)
 
 
     print("-----Normalising the player data-----")
-    for playerID, playerData in players:
+    for index, row in players.iterrows():
 
+        #loop through data set and get desired player data (kills, assists, deaths)
+        playerData = row
         filledData = playerData[["KB", "D", "HK"]].fillna(0)
 
+        #player data
         playerKills = filledData["KB"]
-        mostKills = filledData["KB"].max()
-        normalisedKills = playerKills / mostKills
-        totalKillsNorm.append(normalisedKills)
-
-        print(f"Debug:\nplayerKills: {playerKills}\nmostKills: {mostKills}\n")
-
-
-        playerAssists = filledData["HK"]
-        mostAssists = filledData["HK"].max()
-        normalisedAssists = playerAssists / mostAssists
-        totalAssistsNorm.append(normalisedAssists)        
-
-        print(f"Debug:\nplayerAssists: {playerAssists}\nmostAssists: {mostAssists}\n")
-
-
+        playerAssists = filledData["HK"]   
         playerDeaths = filledData["D"]
-        mostDeaths = filledData["D"].max()
-        normalisedDeaths = playerDeaths / mostDeaths
-        totalDeathsNorm.append(normalisedDeaths)
 
-        print(f"Debug:\nplayerDeaths: {playerDeaths}\nmostDeaths: {mostDeaths}\n")
+        #set cassification rules
+        if playerKills >= 6 and playerDeaths >= 3 and playerDeaths <= 8:
+            playerClassifications[index] = "Assault"
+        elif playerAssists >= 6 and playerDeaths >= 4:
+            playerClassifications[index] = "Team Player"
+        elif playerKills <= 7 and playerKills >= 2 and playerDeaths <= 7 and playerAssists >= 2:
+            playerClassifications[index] = "Defender"
+        elif playerKills >= 1 and playerKills <= 5 and playerDeaths >= 1:
+            playerClassifications[index] = "Scout"
+        elif playerDeaths >= 1:
+            playerClassifications[index] = "Casual Player"
 
-
-        print("-----Processing data against rules-----")
-        for playerID, playerData in players:
-
-            playerKills = filledData["KB"]
-            mostKills = filledData["KB"].max()
-            normalisedKills = playerKills / mostKills
-
-            playerAssists = filledData["HK"]
-            mostAssists = filledData["HK"].max()
-            normalisedAssists = playerAssists / mostAssists
-
-            playerDeaths = filledData["D"]
-            mostDeaths = filledData["D"].max()
-            normalisedDeaths = playerDeaths / mostDeaths
+        else:
+            playerClassifications[index] = "Not Classified"
 
 
-            if normalisedKills[playerID] >= 15:
-                playerClassifications[playerID] = "Legendary"
-            elif normalisedKills[playerID] >= 10 and normalisedKills[playerID] < 15:
-                playerClassifications[playerID] = "Godly"
-            elif normalisedKills[playerID] >= 5 and normalisedKills[playerID] < 10:
-                playerClassifications[playerID] = "Average"
-            elif normalisedKills[playerID] >= 1 and normalisedKills[playerID] < 5:
-                playerClassifications[playerID] = "Peasant"
-            elif normalisedKills[playerID] == 0 :
-                playerClassifications[playerID] = "Dead Weight"
-            else:
-                playerClassifications[playerID] = "Not Classified"
 
-            
-            if normalisedAssists[playerID] >= 25:
-                playerClassifications[playerID] = "Setter Upper"
-            elif normalisedAssists[playerID] >= 15 and normalisedAssists[playerID] < 25:
-                playerClassifications[playerID] = "Wingman"
-            elif normalisedAssists[playerID] >= 10 and normalisedAssists[playerID] < 15:
-                playerClassifications[playerID] = "Assistee"
-            elif normalisedAssists[playerID] >= 5 and normalisedAssists[playerID] < 10:
-                playerClassifications[playerID] = "Assist Intern"
-            elif normalisedAssists[playerID] >= 1 and normalisedAssists[playerID] < 5:
-                playerClassifications[playerID] = "Assist Novice"
-            elif normalisedAssists[playerID] == 0 :
-                playerClassifications[playerID] = "Kill Hog"
-            else:
-                playerClassifications[playerID] = "Not Classified"
+    #show the chart
+    tests.PieChartsDraw(playerClassifications, players) 
 
 
-            if normalisedDeaths[playerID] >= 25:
-                playerClassifications[playerID] = "Liability"
-            elif normalisedDeaths[playerID] >= 15 and normalisedDeaths[playerID] < 10:
-                playerClassifications[playerID] = "Grim Reaper's Favourate"
-            elif normalisedDeaths[playerID] >= 10 and normalisedDeaths[playerID] < 5:
-                playerClassifications[playerID] = "Average Death"
-            elif normalisedDeaths[playerID] >= 5 and normalisedDeaths[playerID] < 10:
-                playerClassifications[playerID] = "Death Dodger"
-            elif normalisedDeaths[playerID] >= 1 and normalisedDeaths[playerID] < 5:
-                playerClassifications[playerID] = "Invincible"
-            elif normalisedDeaths[playerID] == 0 :
-                playerClassifications[playerID] = "Flawless"
-            else:
-                playerClassifications[playerID] = "Not Classified"
-
-
+#AI's classification funciton
 def PlayerClassificationAI(players):
 
+    #create lists to sort player data
     print("-----AI's player classification-----")
     playerStats = []  
     classNames = []  
 
 
     print("-----AI Traing Data Set-----")
-    for playerID, playerData in players:
-        #iterate over every row
-        for index, row in playerData.iterrows():
+    for index, row in players.iterrows():
 
-            #gets the stats per game for each player
-            stats = [
-                row['KB'],
-                row['D'],
-                row['HK'],
-            ]
+        #gets the stats per game for each player
+        stats = [
+            row['KB'],
+            row['D'],
+            row['HK'],
+        ]
 
-            #add these stats to the AI's knowledge listW of player stats
-            playerStats.append(stats)
+        #add these stats to the AI's knowledge listW of player stats
+        playerStats.append(stats)
 
-            #gets the classification of each player from the dictionary created above
-            classification = playerClassifications[playerID]
+        #gets the classification of each player from the dictionary created above
+        classification = playerClassifications[index]
+        print(classification)
 
-            #turns each class into a value to make it easier for outputting from the AI (essentially works like having an int array instead
-            #of a string array)
-            if classification == "Legendary":
-                classNames.append(1)
-            elif classification == "Godly":
-                classNames.append(2)
-            elif classification == "Average":
-                classNames.append(3)
-            elif classification == "Peasant":
-                classNames.append(4)
-            elif classification == "Dead Weight":
-                classNames.append(5)
+        #turns each class into a value to make it easier for outputting from the AI (essentially works like having an int array instead
+        #of a string array)
+        if classification == "Assault":
+            classNames.append(1)
+        elif classification == "Team Player":
+            classNames.append(2)
+        elif classification == "Defender":
+            classNames.append(3)
+        elif classification == "Scout":
+            classNames.append(4)
+        elif classification == "Casual Player":
+            classNames.append(5)
+        else:
+            classNames.append(6)
 
     #split the data into enough to train the AI, then enough to test this learning
     print("-----Splitting All AI Data Sets-----")
-    X_train, X_test, y_train, y_test = train_test_split(playerStats, classNames, test_size=0.1, random_state=42) #playerStats is the X, classNames is the Y
+
+    X_train, X_test, y_train, y_test = train_test_split(playerStats, classNames, test_size=0.5, random_state=42) #playerStats is the X, classNames is the Y
 
     #begin to train the AI
     print("-----Training AI-----")
@@ -186,12 +129,13 @@ def PlayerClassificationAI(players):
 
     #iterate through the AI's predictions and store them in a second dictionary
     print("-----Prediction results being stored-----")
-    for i, (playerID, _) in enumerate(players):       #for loop which cycles through all of the players dataset
-        playerClassificationsAI[playerID] = yPredict[i]   #stores all predicted classes into dictionary next to correct player ID
+    print(yPredict)
+    for index, predict in enumerate(yPredict):       #for loop which cycles through all of the players dataset
+        playerClassificationsAI[index] = predict  #stores all predicted classes into dictionary next to correct player ID
 
     #draws a pie chart displaying how the AI predicted the split of classes
     print("-----Displaying classes predicted-----")
-    tests.drawPieChartsAI(playerClassificationsAI, players) 
+    tests.PieChartsDrawAI(playerClassificationsAI, players) 
 
     #writes out an accuracy report showing where the AI was most and least accurate    
     print("Drawing AI's accuracy chart")
