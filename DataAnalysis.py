@@ -1,7 +1,12 @@
+'''
+Harry Findlay
+2102552
+'''
+
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import classification_report
-from statistics import mean
+#from statistics import mean
 import UserTesting as tests
 
 
@@ -39,7 +44,7 @@ def PlayerClassification(players):
         totalDeathsArr.append(totalDeaths)
 
 
-    print("-----Normalising the player data-----")
+    print("-----Config the player data-----")
     for index, row in players.iterrows():
 
         #loop through data set and get desired player data (kills, assists, deaths)
@@ -91,15 +96,14 @@ def PlayerClassificationAI(players):
             row['HK'],
         ]
 
-        #add these stats to the AI's knowledge listW of player stats
+        #add stats to AI's knowledge lists of player stats
         playerStats.append(stats)
 
         #gets the classification of each player from the dictionary created above
         classification = playerClassifications[index]
         print(classification)
 
-        #turns each class into a value to make it easier for outputting from the AI (essentially works like having an int array instead
-        #of a string array)
+        #turns each classification into a numerical value ot allow for easier sorting and outputting
         if classification == "Assault":
             classNames.append(1)
         elif classification == "Team Player":
@@ -113,31 +117,31 @@ def PlayerClassificationAI(players):
         else:
             classNames.append(6)
 
-    #split the data into enough to train the AI, then enough to test this learning
+    #split the data into a ratio, turning the data into sub-data sets: training and testing data sets
     print("-----Splitting All AI Data Sets-----")
 
-    X_train, X_test, y_train, y_test = train_test_split(playerStats, classNames, test_size=0.5, random_state=42) #playerStats is the X, classNames is the Y
+    X_train, X_test, y_train, y_test = train_test_split(playerStats, classNames, test_size=0.4, random_state=42) #playerStats is the X, classNames is the Y
 
-    #begin to train the AI
+    #beging AI training process
     print("-----Training AI-----")
-    decisionTreeClassifier = DecisionTreeClassifier()     #creates a new decision tree classifier for supervised learning
-    decisionTreeClassifier.fit(X_train, y_train)   #uses the player stats stored in X and labels attached to these stats in Y to learn the class rules
+    decisionTreeClassifier = DecisionTreeClassifier() #create a new dicision tree for predictions
+    decisionTreeClassifier.fit(X_train, y_train) #attach playerStats data and lables to classNames and classifictions data
 
-    #make predictions
+    #start predicion process
     print("-----Making Predictions-----")
-    yPredict = decisionTreeClassifier.predict(X_test)     #uses the portion of data stored in x_test to make predictions and stores these labels in y_predict
+    yPredict = decisionTreeClassifier.predict(X_test) #makes predictions using the x test data (playerStats) and stores the generated labels
 
-    #iterate through the AI's predictions and store them in a second dictionary
+    #iterate through AI predicitons and store in new dict.
     print("-----Prediction results being stored-----")
     print(yPredict)
-    for index, predict in enumerate(yPredict):       #for loop which cycles through all of the players dataset
-        playerClassificationsAI[index] = predict  #stores all predicted classes into dictionary next to correct player ID
+    for index, predict in enumerate(yPredict):  #iterate through all player data
+        playerClassificationsAI[index] = predict  #store all prediciotns made next to the appropriate player
 
-    #draws a pie chart displaying how the AI predicted the split of classes
+    #pie chart to visualise prediction results
     print("-----Displaying classes predicted-----")
     tests.PieChartsDrawAI(playerClassificationsAI, players) 
 
-    #writes out an accuracy report showing where the AI was most and least accurate    
+    #generate accuracy report   
     print("Drawing AI's accuracy chart")
     accuracyReport = classification_report(y_test, yPredict)
     print(accuracyReport)

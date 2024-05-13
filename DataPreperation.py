@@ -1,3 +1,8 @@
+'''
+Harry Findlay
+2102552
+'''
+
 import pandas
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
@@ -6,22 +11,17 @@ def ReadData():
     global playerData
     global fillerData
 
-    #read in the file and use pandas to read the csv
-    playerCSVData = "data/wowbgs.csv"
-    playerData = pandas.read_csv(playerCSVData)
+    #read in the dataset using pandas on the specified directory
+    playerData = pandas.read_csv("data/wowbgs.csv")
 
-    fillerData = playerData[['KB', 'D', 'HK']].fillna(0) #player gender, player age, character class{es}, character race(s)
+    fillerData = playerData[['KB', 'D', 'HK']].fillna(0) #player kills, deaths, assists
 
-def FilterByFaction(faction):
-    playerFilteredData = playerData[playerData["Faction"] == faction]
-
-    return playerFilteredData
-
+#funciton to calculate the optimal number of clusters, also plots a graph
 def ElbowPlot():
     global withinSumOfSquares
 
     withinSumOfSquares = []
-    elbowCheck = 50 #max num of clusters
+    elbowCheck = 50 #max number of available clusters
 
     print("-----Calculating data-----\n")
 
@@ -32,3 +32,9 @@ def ElbowPlot():
     print("-----Graph Plotting-----")
     plt.plot(withinSumOfSquares)
     plt.show()
+
+#filter dataset by faction, used to specify/split
+def FilterByFaction(faction):
+    playerFilteredData = playerData[playerData["Faction"] == faction]
+
+    return playerFilteredData

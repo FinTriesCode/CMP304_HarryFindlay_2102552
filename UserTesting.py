@@ -1,8 +1,13 @@
+'''
+Harry Findlay
+2102552
+'''
+
 import matplotlib.pyplot as plt
 
-#draws pie chart for manual classification
+#generate pie charts for the ',manual' classifications
 def PieChartsDraw(classes, dataset):
-    #default vars which will decide size of each section
+    #variables defined to be incremented accordingly. These will be used to create a list later on.
     Assault = 0 
     TeamPlayer = 0
     Defender = 0
@@ -11,13 +16,13 @@ def PieChartsDraw(classes, dataset):
     other = 0
     
 
-    #iterate through the classes dictionary
-    for index, row in dataset.iterrows():
+    #iterate thorugh each row in the data set
+    for index, row  in dataset.iterrows():
 
-        #get the class string from each player ID
+        #get the class label from each row in te data set
         classification = classes[index]
 
-        #add one to the counter of the appropriate class as it is found in dictionary
+        #increment accordingly
         if classification == "Assault":
             Assault += 1
         elif classification == "Team Player":
@@ -31,20 +36,23 @@ def PieChartsDraw(classes, dataset):
         else:
             other += 1
 
-    #define labels for each section
+    #initialise labels/tags
     labels = "Assault", "Team Player", "Defender", "Scout", "Casual Player", "Undefined"
     sizes = [Assault, TeamPlayer, Defender, Scout, CasualPlayer, other]
 
-    #create the pie chart
+    #plot and generate piechart
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct="%1.1f%%")    #uses sizes and labels lists from above, autopct rounds each section to 1dp
-
-    #display
     plt.show()
 
-#draws pie chart for AI classification
+#generate pie chart using MLAI's classifications
 def PieChartsDrawAI(classes, dataset):
-    #all is exactly the same as the function above, except the first iterator works slightly differently
+
+    '''
+    all comments in this function are the same as the funcitons found within PieChartsDraw(classes, dataset)
+    any notable changes will be included as comments wihtin this funciton
+    '''
+
     Assault = 0 
     TeamPlayer = 0
     Defender = 0
@@ -54,8 +62,8 @@ def PieChartsDrawAI(classes, dataset):
 
     for index in range(0, len(classes)):
         classification = classes[index]
-        #largely the same as above, however since the AI is using integers to store class with each ID, it must check which integer
-        #is found in each iteration instead of which string, could have been done in same function but this way is more maintainable
+        
+        #uses the integeral value that the data was assigned previously to sort, intead of tags or labels
         if classification == 1:
             Assault += 1
         elif classification == 2:
@@ -76,5 +84,4 @@ def PieChartsDrawAI(classes, dataset):
 
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%')
-
     plt.show()
